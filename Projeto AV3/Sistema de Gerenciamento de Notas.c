@@ -68,14 +68,13 @@ int main(){
 
         } else if(op == 7){
             printf("Programa encerrado.\n");
+            salvarDados(alunos, numAlunos);
             break;
             
         } else {
             printf("\n");
             printf("Opção inválida!\n");
         }
-
-        salvarDados(alunos, numAlunos);
     }
     return 0;
 }

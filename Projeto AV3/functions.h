@@ -39,11 +39,12 @@ void carregarDados(Aluno alunos[], int *numAlunos) {
     }
 
     *numAlunos = 0;
-    while (*numAlunos < MAX_ALUNOS && fscanf(arquivo, "%s %d %s %f %f %f %f",
+    while (*numAlunos < MAX_ALUNOS && fscanf(arquivo, "%49s %d %49s %f %f %f %f\n",
                                             alunos[*numAlunos].nome, &alunos[*numAlunos].matricula,
                                             alunos[*numAlunos].curso, &alunos[*numAlunos].notas[0],
                                             &alunos[*numAlunos].notas[1], &alunos[*numAlunos].notas[2],
-                                            &alunos[*numAlunos].media) == 8) {
+                                            &alunos[*numAlunos].media) == 7) {
+        printf("Alunos carregados: %s\n", alunos[*numAlunos].nome);
         (*numAlunos)++;
     }
 
@@ -52,9 +53,11 @@ void carregarDados(Aluno alunos[], int *numAlunos) {
 
 void cadastrarAluno(Aluno alunos[], int *numAlunos){
 
+    int i;
+
     if (*numAlunos < MAX_ALUNOS) {
         printf("Digite o nome do aluno:\n");
-        scanf("%s", alunos[*numAlunos].nome);
+        scanf(" %49[^\n]", alunos[*numAlunos].nome);
         printf("\n");
         printf("Digite a matrícula:\n");
         scanf("%d", &alunos[*numAlunos].matricula);
@@ -62,6 +65,17 @@ void cadastrarAluno(Aluno alunos[], int *numAlunos){
         printf("Digite o curso:\n");
         scanf("%s", alunos[*numAlunos].curso);
         printf("\n");
+
+        for (i = 0; i < *numAlunos; i++){
+            if (alunos[i].matricula == alunos[*numAlunos].matricula){
+                printf("Matrícula já em uso!\n");
+                printf("\n");
+                printf("Insira outra matrícula:\n");
+                scanf("%d", &alunos[*numAlunos].matricula);
+                i = -1;
+            }
+        }
+
         (*numAlunos)++;
         printf("Aluno cadastrado com sucesso!\n");
         printf("\n");
@@ -87,12 +101,15 @@ void cadastrarNotas(Aluno alunos[], int numAlunos){
             scanf("%f", &alunos[i].notas[1]);
             printf("Digite a nota AV3:\n");
             scanf("%f", &alunos[i].notas[2]);
+
+            alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3; //calcular média do aluno
             printf("Notas cadastradas com sucesso!\n");
             printf("\n");
             printf("As notas do aluno %s são:\n", alunos[i].nome);
             printf("AV1: %.2f\n", alunos[i].notas[0]);
             printf("AV2: %.2f\n", alunos[i].notas[1]);
             printf("AV3: %.2f\n", alunos[i].notas[2]);
+            printf("Média: %.2f\n", alunos[i].media);
             return;
         }
     }
