@@ -8,7 +8,7 @@ int main(){
     Aluno alunos[MAX_ALUNOS];
     int numAlunos;
 
-    carregarDados(alunos, &numAlunos);
+    carregarAlunosDeBinario(alunos, &numAlunos);
 
     while (1){
         printf("\n");
@@ -66,9 +66,11 @@ int main(){
             printf("-----------------------------------------\n");
             printf("\n");
 
+            salvarAlunosEmCSV(alunos, numAlunos);
+            
         } else if(op == 7){
             printf("Programa encerrado.\n");
-            salvarDados(alunos, numAlunos);
+            salvarAlunosEmBinario(alunos, numAlunos);
             break;
             
         } else {

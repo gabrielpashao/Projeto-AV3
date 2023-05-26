@@ -15,42 +15,45 @@ typedef struct {
 
 // Funções
 
-void salvarDados(Aluno alunos[], int numAlunos) {
-    FILE *arquivo = fopen("dados.txt", "w");
+// Carregar os dados do arquivo binário
+void carregarAlunosDeBinario(Aluno alunos[], int *numAlunos) {
+    
+    FILE* arquivo = fopen("alunos.bin", "rb");
+
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
-    for (int i = 0; i < numAlunos; i++) {
-        fprintf(arquivo, "%s %d %s %.2f %.2f %.2f %.2f\n",
-                alunos[i].nome, alunos[i].matricula, alunos[i].curso,
-                alunos[i].notas[0], alunos[i].notas[1], alunos[i].notas[2], alunos[i].media);
-    }
-
+    fread(numAlunos, sizeof(int), 1, arquivo);
+    fread(alunos, sizeof(Aluno), *numAlunos, arquivo);
     fclose(arquivo);
+
+    printf("Os dados dos alunos foram carregados do arquivo alunos.bin.\n");
+    
+    for(int i = 0; i < *numAlunos; i++){
+    printf("Aluno: %s | Matrícula: %d\n", alunos[i].nome, alunos[i].matricula);
+    }
 }
 
-void carregarDados(Aluno alunos[], int *numAlunos) {
-    FILE *arquivo = fopen("dados.txt", "r");
+// Salvar os dados no arquivo binário
+void salvarAlunosEmBinario(Aluno alunos[], int numAlunos) {
+    
+    FILE* arquivo = fopen("alunos.bin", "wb");
+
     if (arquivo == NULL) {
-        printf("Arquivo de dados não encontrado. Será criado um novo arquivo.\n");
+        printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
-    *numAlunos = 0;
-    while (*numAlunos < MAX_ALUNOS && fscanf(arquivo, "%49s %d %49s %f %f %f %f\n",
-                                            alunos[*numAlunos].nome, &alunos[*numAlunos].matricula,
-                                            alunos[*numAlunos].curso, &alunos[*numAlunos].notas[0],
-                                            &alunos[*numAlunos].notas[1], &alunos[*numAlunos].notas[2],
-                                            &alunos[*numAlunos].media) == 7) {
-        printf("Alunos carregados: %s\n", alunos[*numAlunos].nome);
-        (*numAlunos)++;
-    }
-
+    fwrite(&numAlunos, sizeof(int), 1, arquivo);
+    fwrite(alunos, sizeof(Aluno), numAlunos, arquivo);
     fclose(arquivo);
+
+    printf("Os dados dos alunos foram salvos no arquivo alunos.bin.\n");
 }
 
+// Cadastrar alunos novos
 void cadastrarAluno(Aluno alunos[], int *numAlunos){
 
     int i;
@@ -84,8 +87,11 @@ void cadastrarAluno(Aluno alunos[], int *numAlunos){
     } else {
         printf("Limite de alunos atingido. Impossível cadastrar.\n");
     }
+
+    VoltarAoMenu();
 }
 
+// Cadastrar notas
 void cadastrarNotas(Aluno alunos[], int numAlunos){
 
     int matricula, i;
@@ -95,14 +101,42 @@ void cadastrarNotas(Aluno alunos[], int numAlunos){
 
     for (i = 0; i < numAlunos; i++) {
         if (alunos[i].matricula == matricula) {
-            printf("Digite a nota AV1:\n");
-            scanf("%f", &alunos[i].notas[0]);
-            printf("Digite a nota AV2:\n");
-            scanf("%f", &alunos[i].notas[1]);
-            printf("Digite a nota AV3:\n");
-            scanf("%f", &alunos[i].notas[2]);
+            
+            float av1, av2, av3;
+            
+            do{
+                printf("Digite a nota AV1:\n");
+                scanf("%f", &av1);
+                if (av1 > 10){
+                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                    printf("\n");
+                }
+            } while (av1 > 10);
+            
+            do{
+                printf("Digite a nota AV2:\n");
+                scanf("%f", &av2);
+                if (av2 > 10){
+                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                    printf("\n");
+                }
+            } while (av2 > 10);
+        
+            do{
+                printf("Digite a nota AV3:\n");
+                scanf("%f", &av3);
+                if (av3 > 10){
+                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                    printf("\n");
+                }
+            } while (av3 > 10);
 
-            alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3; //calcular média do aluno
+            alunos[i].notas[0] = av1;
+            alunos[i].notas[1] = av2;
+            alunos[i].notas[2] = av3;
+
+            alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3;
+
             printf("Notas cadastradas com sucesso!\n");
             printf("\n");
             printf("As notas do aluno %s são:\n", alunos[i].nome);
@@ -110,13 +144,15 @@ void cadastrarNotas(Aluno alunos[], int numAlunos){
             printf("AV2: %.2f\n", alunos[i].notas[1]);
             printf("AV3: %.2f\n", alunos[i].notas[2]);
             printf("Média: %.2f\n", alunos[i].media);
-            return;
+        } else {
+            printf("Aluno com a matrícula informada não encontrado.\n");
         }
     }
 
-    printf("Aluno com a matrícula informada não encontrado.\n");
+    VoltarAoMenu();
 }
 
+// Calcular média individual
 void calcMediaIndiv (Aluno alunos[], int numAlunos){
 
     int matricula, i;
@@ -126,15 +162,16 @@ void calcMediaIndiv (Aluno alunos[], int numAlunos){
 
     for (i = 0; i < numAlunos; i++){
         if (alunos[i].matricula == matricula){
-            alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3;
             printf("A média do aluno %s é: %.2f", alunos[i].nome, alunos[i].media);
-        return;
+        } else{
+            printf("Aluno com a matrícula informada não encontrado.\n");
         }
     }
 
-    printf("Aluno com a matrícula informada não encontrado.\n");
+    VoltarAoMenu();
 }
 
+// Calcular média da turma
 void calcMediaTurma (Aluno alunos[], int numAlunos){
 
     float mediaTurma;
@@ -147,9 +184,11 @@ void calcMediaTurma (Aluno alunos[], int numAlunos){
 
     mediaTurma = somaMedia/numAlunos;
     printf("A média da turma é: %.2f \n", mediaTurma);
-    return;
+    
+    VoltarAoMenu();
 }
 
+// Exibiri ranking de melhores médias
 void ranking (Aluno alunos[], int numAlunos){
 
     int i, j;
@@ -165,8 +204,40 @@ void ranking (Aluno alunos[], int numAlunos){
     }
 
     printf("Ranking das melhores médias da turma:\n");
+    printf("\n");
     for (int i = 0; i < numAlunos; i++) {
         printf("%d. Aluno: %s | Média: %.2f\n", i + 1, alunos[i].nome, alunos[i].media);
     }
+    
+    VoltarAoMenu();
+}
+
+// Salvar dados em arquivo externo 
+void salvarAlunosEmCSV(Aluno alunos[], int numAlunos) {
+    
+    FILE* arquivo = fopen("alunos.csv", "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    for (int i = 0; i < numAlunos; i++) {
+        fprintf(arquivo, "%s;%d;%s;%.2f;%.2f;%.2f;%.2f\n", alunos[i].nome, alunos[i].matricula,
+                alunos[i].curso, alunos[i].notas[0], alunos[i].notas[1], alunos[i].notas[2], alunos[i].media);
+    }
+    fclose(arquivo);
+
+    printf("Os dados dos alunos foram salvos no arquivo alunos.csv.\n");
+
+    VoltarAoMenu();
+}
+
+// Retornar ao menu principal 
+void VoltarAoMenu(){
+
+ printf("\nPressione ENTER para retornar ao menu principal.");
+    getchar();
+    while (getchar() != '\n');
     return;
 }
