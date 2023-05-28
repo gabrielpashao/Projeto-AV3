@@ -20,6 +20,8 @@ int main(){
         printf("\n");
         scanf("%d", &op);
 
+        limparTela();
+
         if (op == 1){
             printf("\n");
             printf("Cadastrar novo aluno\n");
@@ -76,6 +78,8 @@ int main(){
         } else {
             printf("\n");
             printf("Opção inválida!\n");
+
+            VoltarAoMenu();
         }
     }
     return 0;

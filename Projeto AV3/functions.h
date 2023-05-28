@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define MAX_ALUNOS 100
+
+#ifdef _WIN32
+    #define CLEAR_SCREEN "cls" // Comando para limpar a tela no Windows
+#else
+    #define CLEAR_SCREEN "clear" // Comando para limpar a tela no Linux
+#endif
 
 // Estrutura de Dados
 
@@ -14,6 +21,11 @@ typedef struct {
 } Aluno;
 
 // Funções
+
+// Limpar a tela
+void limparTela(){
+    system(CLEAR_SCREEN);
+}
 
 // Carregar os dados do arquivo binário
 void carregarAlunosDeBinario(Aluno alunos[], int *numAlunos) {
@@ -95,59 +107,67 @@ void cadastrarAluno(Aluno alunos[], int *numAlunos){
 void cadastrarNotas(Aluno alunos[], int numAlunos){
 
     int matricula, i;
+    bool alunoEncontrado = false;
 
     printf("Digite a matrícula do aluno:\n");
     scanf("%d", &matricula);
 
     for (i = 0; i < numAlunos; i++) {
-        if (alunos[i].matricula == matricula) {
+        if (alunos[i].matricula == matricula){
+
+        float av1, av2, av3;
             
-            float av1, av2, av3;
-            
-            do{
-                printf("Digite a nota AV1:\n");
-                scanf("%f", &av1);
-                if (av1 > 10){
-                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
-                    printf("\n");
+        do{
+            printf("Digite a nota AV1:\n");
+            scanf("%f", &av1);
+            if (av1 > 10){
+                printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                printf("\n");
                 }
-            } while (av1 > 10);
+        } while (av1 > 10);
             
-            do{
-                printf("Digite a nota AV2:\n");
-                scanf("%f", &av2);
-                if (av2 > 10){
-                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
-                    printf("\n");
+        do{
+            printf("Digite a nota AV2:\n");
+            scanf("%f", &av2);
+            if (av2 > 10){
+                printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                printf("\n");
                 }
-            } while (av2 > 10);
+        } while (av2 > 10);
         
-            do{
-                printf("Digite a nota AV3:\n");
-                scanf("%f", &av3);
-                if (av3 > 10){
-                    printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
-                    printf("\n");
+        do{
+            printf("Digite a nota AV3:\n");
+            scanf("%f", &av3);
+            if (av3 > 10){
+                printf("Nota inválida! Insira uma nota menor ou igual a 10.\n");
+                printf("\n");
                 }
-            } while (av3 > 10);
+        } while (av3 > 10);
 
-            alunos[i].notas[0] = av1;
-            alunos[i].notas[1] = av2;
-            alunos[i].notas[2] = av3;
+        alunos[i].notas[0] = av1;
+        alunos[i].notas[1] = av2;
+        alunos[i].notas[2] = av3;
 
-            alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3;
+        alunos[i].media = (alunos[i].notas[0] + alunos[i].notas[1] + alunos[i].notas[2])/3;
 
-            printf("Notas cadastradas com sucesso!\n");
-            printf("\n");
-            printf("As notas do aluno %s são:\n", alunos[i].nome);
-            printf("AV1: %.2f\n", alunos[i].notas[0]);
-            printf("AV2: %.2f\n", alunos[i].notas[1]);
-            printf("AV3: %.2f\n", alunos[i].notas[2]);
-            printf("Média: %.2f\n", alunos[i].media);
-        } else {
-            printf("Aluno com a matrícula informada não encontrado.\n");
+        printf("Notas cadastradas com sucesso!\n");
+        printf("\n");
+        printf("As notas do aluno %s são:\n", alunos[i].nome);
+        printf("AV1: %.2f\n", alunos[i].notas[0]);
+        printf("AV2: %.2f\n", alunos[i].notas[1]);
+        printf("AV3: %.2f\n", alunos[i].notas[2]);
+        printf("Média: %.2f\n", alunos[i].media);
+
+        alunoEncontrado = true;
+
+        break;
         }
     }
+            
+    if (!alunoEncontrado){
+        printf("Aluno com a matrícula informada não encontrado.\n");
+    }
+
 
     VoltarAoMenu();
 }
@@ -156,16 +176,25 @@ void cadastrarNotas(Aluno alunos[], int numAlunos){
 void calcMediaIndiv (Aluno alunos[], int numAlunos){
 
     int matricula, i;
+    bool alunoEncontrado = false;
 
     printf("Digite a matricula do aluno:\n");
     scanf("%d", &matricula);
 
     for (i = 0; i < numAlunos; i++){
         if (alunos[i].matricula == matricula){
-            printf("A média do aluno %s é: %.2f", alunos[i].nome, alunos[i].media);
-        } else{
-            printf("Aluno com a matrícula informada não encontrado.\n");
+
+            printf("A média do aluno %s é: %.2f\n", alunos[i].nome, alunos[i].media);
+            printf("\n");
+
+            alunoEncontrado = true;
+            break;
         }
+    }
+
+    if (!alunoEncontrado){
+        printf("Aluno com a matrícula informada não encontrado.\n");
+        printf("\n");
     }
 
     VoltarAoMenu();
@@ -239,5 +268,8 @@ void VoltarAoMenu(){
  printf("\nPressione ENTER para retornar ao menu principal.");
     getchar();
     while (getchar() != '\n');
+
+    limparTela();
+
     return;
 }
